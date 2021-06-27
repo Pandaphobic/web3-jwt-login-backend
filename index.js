@@ -6,6 +6,7 @@ const dotenv = require("dotenv")
 // Import Routes
 const authRoute = require("./routes/auth")
 const postRoute = require("./routes/posts")
+const profileRoute = require("./routes/profile")
 
 // Enable .env file
 dotenv.config()
@@ -21,6 +22,7 @@ app.use(express.json())
 // Route Middlewares
 app.use("/api/user", authRoute)
 app.use("/api/posts", postRoute)
+app.use("/api/user/profile", profileRoute)
 
 app.listen(3000, () => {
   console.log("Server up and running! http://localhost:3000")
