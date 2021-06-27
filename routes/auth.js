@@ -15,7 +15,7 @@ router.post('/register', async (req, res)=>{
   // Validate before making a user
   const { error } = joiSchema.validate(req.body)
   if(error) {return res.status(400).send(error.details[0].message)}
-
+  //something 
   const user = new User({
     name: req.body.name,
     email: req.body.email,
