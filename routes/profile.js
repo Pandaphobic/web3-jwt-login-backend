@@ -12,11 +12,10 @@ TODO:
 module.exports = router.get("/:userID", verify, async (req, res) => {
   // Get userID of request
   const reqUserId = req.user._id
-  let idExists
 
   // Check if user alerady exists
   try {
-    idExists = await User.findOne({
+    const idExists = await User.findOne({
       _id: req.params.userID
     })
     // If requesting user is the the same as the one we're getting
@@ -26,6 +25,4 @@ module.exports = router.get("/:userID", verify, async (req, res) => {
   } catch (err) {
     res.status(404).send(`User does not exist`)
   }
-
-  // if (!idExists) return res.status(404).send("UserId not found")
 })
