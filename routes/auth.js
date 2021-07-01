@@ -42,17 +42,17 @@ router.post("/login", async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message)
 
   // Check if user alerady exists
-  const user = await User.findOne({
-    email: req.body.email
+  const user = await User.findOne({ $or: [{ email: req.body.email }, { walletAddress: req.body.walletAddress }] }).exec(async function (err, user) {
+    //no users with that email NOR walletAddress exist.
+    if (!user) return res.status(400).send("Login incorrect.")
+    //user already exists with email AND/OR walletAddress.
+    const validPass = await bcrypt.compare(req.body.password, user.password)
+    if (!validPass) return res.status(400).send("Password incorrect")
+    // Upon Successful Login
+    // Create and assign a token
+    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET)
+    res.header("auth-token", token).send(token)
   })
-  if (!user) return res.status(400).send("Email incorrect.")
-  const validPass = await bcrypt.compare(req.body.password, user.password)
-  if (!validPass) return res.status(400).send("Password incorrect")
-
-  // Upon Successful Login
-  // Create and assign a token
-  const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET)
-  res.header("auth-token", token).send(token)
 })
 
 module.exports = router

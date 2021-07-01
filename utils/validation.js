@@ -12,8 +12,8 @@ const registerValidation = data => {
   const joiSchema = Joi.object({
     name: Joi.string().min(5).required(),
     email: Joi.string().min(6).required().email(),
-    password: Joi.string().min(20).required(),
-    walletAddress: Joi.string().min(42).required()
+    walletAddress: Joi.string().min(42).required(),
+    password: Joi.string().min(20).required()
   })
   // Validate before making a user
   return joiSchema.validate(data)
@@ -21,10 +21,10 @@ const registerValidation = data => {
 
 const loginValidation = data => {
   const joiSchema = Joi.object({
-    email: Joi.string().min(6).required().email(),
-    password: Joi.string().min(20).required(),
-    walletAddress: Joi.string().min(42).required()
-  })
+    email: Joi.string().min(6).email(),
+    walletAddress: Joi.string().min(42),
+    password: Joi.string().min(20).required()
+  }).xor("email", "walletAddress")
   // Validate before logging in user
   return joiSchema.validate(data)
 }
