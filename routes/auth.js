@@ -16,6 +16,12 @@ router.post("/register", async (req, res) => {
   });
   if (emailExists) return res.status(400).send("Email already exists!");
 
+  // Check if user alerady exists
+  const walletExists = await User.findOne({
+    email: req.body.email,
+  });
+  if (walletExists) return res.status(400).send("Wallet already exists!");
+
   // Hash the password
   const salt = await bcrypt.genSalt(10);
   const hashPassword = await bcrypt.hash(req.body.password, salt);
@@ -26,6 +32,7 @@ router.post("/register", async (req, res) => {
     email: req.body.email,
     password: hashPassword,
     walletAddress: req.body.walletAddress,
+    nonce: 10,
   });
   try {
     const savedUser = await user.save();
@@ -57,16 +64,33 @@ router.post("/login", async (req, res) => {
   });
 });
 
-router.post("/verifyWallet", async (req, res) => {
+// Login with wallet only
+router.post("/walletLogin", async (req, res) => {
   // Validation
-  const { error } = walletValidation(req.body);
+  const { error } = loginValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  // Check if walletAddress Exists
-  const userByWallet = await User.findOne({
+
+  /*
+    - Accepts Signature, Nonce and Address
+    - Decrypt signature with nonce and address
+    - check if current wallet addess === wallet address in the record
+  */
+
+  // Check if user alerady exists
+  const user = await User.findOne({
     walletAddress: req.body.walletAddress,
+  }).exec(async function (err, user) {
+    //no users with that wallet address
+    if (!user) return res.status(400).send("wallet incorrect.");
+
+    //user already exists with email AND/OR walletAddress.
+    // const validPass = await bcrypt.compare(req.body.password, user.password);
+    // if (!validPass) return res.status(400).send("Password incorrect");
+    // // Upon Successful Login
+    // // Create and assign a token
+    // const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+    // res.header("auth-token", token).send(token);
   });
-  // No users with that walletAddress exist
-  if (!User) return res.status(400).send("Wallet Address Invalid");
 });
 
 module.exports = router;
