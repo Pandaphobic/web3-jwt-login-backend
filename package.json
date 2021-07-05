@@ -1,7 +1,7 @@
 {
-  "name": "node-ticker",
+  "name": "jwt-auth",
   "version": "1.0.0",
-  "description": "Customizeable Node CLI Ticker - Powered by CoinGecko",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js"
@@ -9,11 +9,13 @@
   "author": "Chris Steffes - Pandaphobic",
   "license": "MIT",
   "dependencies": {
-    "chalk": "^3.0.0",
+    "@hapi/joi": "^17.1.1",
+    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "node-emoji": "^1.10.0",
-    "node-fetch": "^2.6.1"
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.15"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
