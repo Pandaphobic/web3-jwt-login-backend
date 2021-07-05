@@ -1,6 +1,10 @@
 const router = require("express").Router();
 const User = require("../model/User");
-const { registerValidation, loginValidation } = require("../utils/validation");
+const {
+  registerValidation,
+  loginValidation,
+  loginWalletValidation,
+} = require("../utils/validation");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -67,30 +71,43 @@ router.post("/login", async (req, res) => {
 // Login with wallet only
 router.post("/walletLogin", async (req, res) => {
   // Validation
-  const { error } = loginValidation(req.body);
+  const { error } = loginWalletValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   /*
     - Accepts Signature, Nonce and Address
     - Decrypt signature with nonce and address
     - check if current wallet addess === wallet address in the record
+    - check request for signature or wallet address
   */
 
-  // Check if user alerady exists
-  const user = await User.findOne({
-    walletAddress: req.body.walletAddress,
-  }).exec(async function (err, user) {
-    //no users with that wallet address
-    if (!user) return res.status(400).send("wallet incorrect.");
-
-    //user already exists with email AND/OR walletAddress.
-    // const validPass = await bcrypt.compare(req.body.password, user.password);
-    // if (!validPass) return res.status(400).send("Password incorrect");
-    // // Upon Successful Login
-    // // Create and assign a token
-    // const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-    // res.header("auth-token", token).send(token);
-  });
+  if (req.body.walletAddress && !req.body.signature) {
+    // Check if user alerady exists
+    const user = await User.findOne({
+      walletAddress: req.body.walletAddress,
+    }).exec(async function (err, user) {
+      //no users with that wallet address
+      if (!user) return res.status(400).send("Wallet Incorrect.");
+      const data = { walletAddress: user.walletAddress, nonce: user.nonce };
+      return res.status(200).send(data);
+    });
+  }
+  if (req.body.walletAddress && req.body.signature) {
+    // Check if user alerady exists
+    const user = await User.findOne({
+      walletAddress: req.body.walletAddress,
+    }).exec(async function (err, user) {
+      //no users with that wallet address
+      if (!user) return res.status(400).send("Wallet Incorrect.");
+      const data = {
+        walletAddress: user.walletAddress,
+        nonce: user.nonce,
+        // signature from request
+        signature: req.body.signature,
+      };
+      return res.status(200).send(data);
+    });
+  }
 });
 
 module.exports = router;

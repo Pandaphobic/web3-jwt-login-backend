@@ -30,9 +30,10 @@ const loginValidation = data => {
   return joiSchema.validate(data);
 };
 
-// Login Validation
-const walletValidation = data => {
+// Wallet Login Validation
+const loginWalletValidation = data => {
   const joiSchema = Joi.object({
+    signature: Joi.string().max(1024),
     walletAddress: Joi.string().min(42),
   });
   // Validate before logging in user
@@ -40,4 +41,4 @@ const walletValidation = data => {
 };
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
-module.exports.walletValidation = walletValidation;
+module.exports.loginWalletValidation = loginWalletValidation;
