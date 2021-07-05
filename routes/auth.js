@@ -105,6 +105,7 @@ router.post("/walletLogin", async (req, res) => {
         // signature from request
         signature: req.body.signature,
       };
+
       return res.status(200).send(data);
     });
   }
